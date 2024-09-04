@@ -1,0 +1,27 @@
+#rules
+version: "3.1"
+
+rules:
+- rule: mostrar_menu_al_inicio_si_horario_valido
+  steps:
+  - intent: saludar  # O cualquier otro intent que inicie la conversación
+  - action: action_check_horario
+  - slot_was_set:
+    - horario_valido: True
+  - action: utter_menu_opciones 
+
+- rule: volver_atras
+  steps:
+  - intent: volver_atras
+  - action: utter_menu_opciones
+
+- rule: volver_al_inicio
+  steps:
+  - intent: volver_al_inicio
+  - action: action_restart
+
+- rule: finalizar_conversacion
+  steps:
+  - intent: finalizar_conversacion
+  - action: utter_despedirse
+

@@ -1,0 +1,33 @@
+
+# config.yml
+recipe: default.v1
+
+#assistant project unique identifier
+assistant_id: dipsi_firstgenbot
+
+language: es # Especifica el idioma español
+
+pipeline:
+- name: WhitespaceTokenizer # Tokeniza el texto en palabras
+- name: RegexFeaturizer # Extrae características basadas en expresiones regulares
+- name: LexicalSyntacticFeaturizer # Extrae características léxicas y sintácticas
+- name: CountVectorsFeaturizer # Convierte las características en vectores de conteo
+- name: DIETClassifier # Clasifica la intención del usuario y extrae entidades
+  epochs: 100
+  random_seed: 42
+  constrain_similarities: True 
+- name: EntitySynonymMapper # Mapea sinónimos de entidades
+  epochs: 100
+  constrain_similarities: True
+  random_seed: 42
+- name: ResponseSelector # Selecciona la respuesta adecuada basándose en la intención
+  constrain_similarities: True
+
+policies:
+- name: MemoizationPolicy # Memoriza las últimas acciones para contextos simples
+- name: RulePolicy # Aplica reglas definidas en el archivo `rules.yml`
+- name: TEDPolicy # Utiliza un modelo de transformador para manejar contextos más complejos
+  max_history: 5 # Considera las últimas 5 interacciones para tomar decisiones
+  epochs: 100 # Número de épocas de entrenamiento
+  random_seed: 42
+  constrain_similarities: True

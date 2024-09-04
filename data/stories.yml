@@ -1,0 +1,47 @@
+# stories.yml
+version: "3.1"
+
+stories:
+
+- story: verificar_horario_inicio
+  steps:
+  - intent: saludar
+  - action: action_check_horario
+  - checkpoint: horario_verificado
+
+- story: respuesta_dentro_de_horario
+  steps:
+  - checkpoint: horario_verificado
+  - slot_was_set:
+      - horario_valido: True
+  - action: utter_menu_opciones  # Mostrar menú si el horario es válido
+  - action: action_listen
+
+- story: respuesta_fuera_de_horario
+  steps:
+  - checkpoint: horario_verificado
+  - slot_was_set:
+      - horario_valido: False
+  - action: action_listen 
+
+- story: solicitar_turno
+  steps:
+  - intent: solicitar_turno #el usuario presiona 1 en el boton de opciones
+  - action: utter_tipo_de_turno 
+
+- story: finalizar_conversacion
+  steps:
+  - intent: finalizar_conversacion
+  - action: utter_despedirse
+
+- story: volver_al_inicio
+  steps:
+  - intent: volver_al_inicio
+  - action: action_restart
+
+- story: volver_atras
+  steps:
+  - intent: volver_atras
+  - action: utter_menu_opciones
+
+

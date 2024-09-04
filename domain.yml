@@ -1,0 +1,55 @@
+# domain.yml
+version: "3.1"  
+
+intents:
+ - saludar
+ - solicitar_turno
+ - modificar_turno
+ - cancelar_turno
+ - consulta_medica
+ - estudio
+ - volver_atras
+ - volver_al_inicio
+ - finalizar_conversacion
+
+slots:
+  horario_valido:
+    type: bool
+    initial_value: False
+    mappings:
+    - type: from_text
+    influence_conversation: True
+
+responses:
+  utter_menu_opciones:
+  - text: "¿Qué necesitás hacer?"
+    buttons:
+    - title: "Solicitar un turno"
+      payload: "/solicitar_turno"
+    - title: "Modificar un turno"
+      payload: "/modificar_turno"
+    - title: "Cancelar un turno"
+      payload: "/cancelar_turno"
+    - title: "Finalizar conversación"
+      payload: "/finalizar_conversacion"
+
+  utter_tipo_de_turno:
+  - text: "¿Qué tipo de turno necesitás agendar?"
+    buttons:
+    - title: "Consulta médica"
+      payload: "/consulta_medica"
+    - title: "Estudio"
+      payload: "/estudio"
+    - title: "Volver atrás"
+      payload: "/volver_atras"
+    - title: "Volver al inicio"
+      payload: "/volver_al_inicio"
+    - title: "Finalizar conversación"
+      payload: "/finalizar_conversacion"
+
+  utter_despedirse:
+  - text: "Gracias por contactarte con nuestro canal virtual de turnos. ¡Qué tengas un excelente día!"
+
+actions:
+  - action_check_horario
+  - action_restart

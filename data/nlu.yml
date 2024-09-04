@@ -1,0 +1,45 @@
+version: "3.1"
+
+nlu:
+- intent: saludar
+  examples: |
+    - hola 
+    - hola si
+    - buen dia
+    - hola buen dia
+    - hola buen día
+    - buenos días
+    - buenos dias
+    - que tal
+    - buenas
+    - buenas noches
+    - buenas tardes
+    - como estás
+    - cómo estás
+    - como estas
+    - cómo estas
+
+- intent: volver_atras
+  examples: |
+    - volver atras
+    - volver atrás
+
+- intent: volver_al_inicio
+  examples: |
+    - volver al inicio
+    - mostrar menu principal
+
+- intent: solicitar_turno
+  examples: |
+    - quiero un turno
+    - necesito agendar un turno
+    - quiero agendar un turno
+    - nesecito sacar un turno
+
+- intent: finalizar_conversacion
+  examples: |
+    - finalizar conversacion
+    - fin conversacion
+
+
+
