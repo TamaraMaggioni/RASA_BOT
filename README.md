@@ -80,7 +80,7 @@ Este proyecto tiene como objetivo desarrollar un chatbot que brinde asistencia a
 
    * Finalmente, entrená y ejecutá el chatbot con los siguientes comandos:
 
-         ```bash
+    ```bash
      rasa train 
      ```
     
