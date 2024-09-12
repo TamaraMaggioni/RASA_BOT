@@ -10,6 +10,26 @@ rules:
     - horario_valido: True
   - action: utter_menu_opciones 
 
+- rule: Activar_form
+  steps:
+  - or:
+    - intent: solicitar_turno
+    - intent: modificar_turno
+    - intent: cancelar_turno
+  - action: utter_pedir_datos
+  - action: pedir_datos_paciente_form
+  - active_loop: pedir_datos_paciente_form
+
+- rule: Desactivar_form
+  condition:
+  - active_loop: pedir_datos_paciente_form
+  steps: 
+  - action: pedir_datos_paciente_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_slot_values
+
 - rule: volver_atras
   steps:
   - intent: volver_atras

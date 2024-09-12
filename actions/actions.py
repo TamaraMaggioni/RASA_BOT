@@ -1,9 +1,7 @@
 from typing import Any, Text, Dict, List
-
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
-
 import datetime
 
 class ActionCheckHorario(Action):
@@ -19,7 +17,7 @@ class ActionCheckHorario(Action):
             now = datetime.datetime.now()
 
             # Verificar si es un día laborable y dentro del horario de atención
-            if now.weekday() < 5 and 8 <= now.hour < 17:
+            if now.weekday() < 5 and 8 <= now.hour < 18:
             # Si es dentro del horario, puedes continuar con el flujo de agendamiento
                 dispatcher.utter_message(text="¡Hola! ¿Cómo estás? Mi nombre es Elena, la asistente virutal del Hospital. Te voy a estar ayudando a gestionar tu turno médico.") 
                 return [SlotSet("horario_valido", True)] # Indicar que el horario es válido
@@ -34,5 +32,4 @@ class ActionCheckHorario(Action):
             # Opcionalmente, puedes registrar el error para depurarlo más tarde
             print(f"Error en action_check_horario: {e}")
             return []  # No establecer ningún slot en caso de error
-            
-            
+

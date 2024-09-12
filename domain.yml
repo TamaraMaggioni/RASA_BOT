@@ -6,11 +6,17 @@ intents:
  - solicitar_turno
  - modificar_turno
  - cancelar_turno
- - consulta_medica
- - estudio
  - volver_atras
  - volver_al_inicio
  - finalizar_conversacion
+
+forms:
+  pedir_datos_paciente_form:
+    required_slots:
+        - nombre_apellido
+        - dni
+        - obra_social
+        - paciente_nuevo
 
 slots:
   horario_valido:
@@ -19,6 +25,39 @@ slots:
     mappings:
     - type: from_text
     influence_conversation: True
+  
+  nombre_apellido:
+    type: text
+    influence_conversation: true
+    mappings:  # Cómo se llena el slot
+    - type: from_text 
+      conditions:
+      - active_loop: pedir_datos_paciente_form
+        requested_slot: nombre_apellido 
+  dni:
+    type: text
+    influence_conversation: true
+    mappings:  
+    - type: from_text  
+      conditions:
+      - active_loop: pedir_datos_paciente_form
+        requested_slot: dni
+  obra_social:
+    type: text
+    influence_conversation: true
+    mappings:  # Cómo se llena el slot
+    - type: from_text  # Extraer de la entidad "obra_social"
+      conditions:
+      - active_loop: pedir_datos_paciente_form
+        requested_slot: obra_social
+  paciente_nuevo:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: pedir_datos_paciente_form
+        requested_slot: paciente_nuevo
 
 responses:
   utter_menu_opciones:
@@ -32,20 +71,33 @@ responses:
       payload: "/cancelar_turno"
     - title: "Finalizar conversación"
       payload: "/finalizar_conversacion"
+  utter_pedir_datos:
+  - text: "Excelente, antes de ayudarte a proceder con tu solicitud, te voy a pedir algunos datos del paciente."
+  utter_ask_nombre_apellido:
+  - text: "¿Me podrías indicar el nombre completo y apellido del paciente?"
+  utter_ask_dni:
+  - text: "¿Me podrías facilitar el DNI? Porfavor, escribí los números del DNI sin puntos ni espacios entremedio."
+  utter_ask_obra_social:
+  - text: "¿Me podrías porfavor especificar la obra social? Si el paciente no cuenta con obra social, no la sabés o no la recordás, escribí \"revisar\"."
+  utter_ask_paciente_nuevo:
+  - text: "¿Es un paciente nuevo en nuestro Centro de Salud? Porfavor, respondé \"sí\", \"no\", \"no lo recuerdo\", o \"desconozco\"."
+  
+  utter_slot_values:
+  - text: "Los datos ingresados del paciente son: {nombre_apellido}, {dni}, {obra_social}. Paciente nuevo: {paciente_nuevo}."
 
-  utter_tipo_de_turno:
-  - text: "¿Qué tipo de turno necesitás agendar?"
-    buttons:
-    - title: "Consulta médica"
-      payload: "/consulta_medica"
-    - title: "Estudio"
-      payload: "/estudio"
-    - title: "Volver atrás"
-      payload: "/volver_atras"
-    - title: "Volver al inicio"
-      payload: "/volver_al_inicio"
-    - title: "Finalizar conversación"
-      payload: "/finalizar_conversacion"
+  #utter_tipo_de_turno:
+  #- text: "¿Qué tipo de turno necesitás agendar?"
+  #  buttons:
+  #  - title: "Consulta médica"
+  #    payload: "/consulta_medica"
+  #  - title: "Estudio"
+  #    payload: "/estudio"
+  #  - title: "Volver atrás"
+  #    payload: "/volver_atras"
+  #  - title: "Volver al inicio"
+  #    payload: "/volver_al_inicio"
+  #  - title: "Finalizar conversación"
+  #    payload: "/finalizar_conversacion"
 
   utter_despedirse:
   - text: "Gracias por contactarte con nuestro canal virtual de turnos. ¡Qué tengas un excelente día!"

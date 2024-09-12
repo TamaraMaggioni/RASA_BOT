@@ -24,10 +24,33 @@ stories:
       - horario_valido: False
   - action: action_listen 
 
-- story: solicitar_turno
+- story: pedir_datos_form
   steps:
-  - intent: solicitar_turno #el usuario presiona 1 en el boton de opciones
-  - action: utter_tipo_de_turno 
+  - or:
+    - intent: solicitar_turno #el usuario presiona 1 en el botn de opciones
+    - intent: modificar_turno #el usuario presiona 2 en el botón de opciones
+    - intent: cancelar_turno #el usuario presiona 3 en el botón de opciones
+  - action: utter_pedir_datos
+  - action: pedir_datos_paciente_form
+  - active_loop: pedir_datos_paciente_form # inicir el formulario para recolectar datos
+  - slot_was_set:
+    - requested_slot: nombre_apellido
+  - slot_was_set:
+    - nombre_apellido: Virginia Wolff
+  - slot_was_set:
+    - requested_slot: dni
+  - slot_was_set:
+    - dni: 25668975
+  - slot_was_set:
+    - requested_slot: obra_social
+  - slot_was_set:
+    - obra_social: Union Personal 
+  - slot_was_set: 
+    - requested_slot: paciente_nuevo
+  - slot_was_set:
+    - paciente_nuevo: si
+  - active_loop: null
+  - action: utter_slot_values
 
 - story: finalizar_conversacion
   steps:

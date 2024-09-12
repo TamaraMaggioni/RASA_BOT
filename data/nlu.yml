@@ -1,10 +1,13 @@
 version: "3.1"
 
+regex:
+- name: dni
+  pattern: '[0-9]{7,8}'
+
 nlu:
 - intent: saludar
   examples: |
     - hola 
-    - hola si
     - buen dia
     - hola buen dia
     - hola buen día
@@ -18,6 +21,24 @@ nlu:
     - cómo estás
     - como estas
     - cómo estas
+
+- intent: solicitar_turno
+  examples: |
+    - quiero un turno
+    - necesito sacar un turno
+    - llamo para un turno
+    - quiero agendar un turno
+
+- intent: cancelar_turno
+  examples: |
+    - quiero cancelar mi turno
+    - cancelar turno
+
+- intent: modificar_turno
+  examples: |
+    - quiero modificar mi turno
+    - quiero modificar el turno
+    - modificar turno
 
 - intent: volver_atras
   examples: |
