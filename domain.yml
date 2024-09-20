@@ -3,8 +3,19 @@ version: "3.1"
 
 intents:
  - saludar
+ - datos_correctos
+ - datos_incorrectos
  - solicitar_turno
+ - consulta_medica
+ - laboratorio
+ - diagnostico_imagenes
+ - especialidad_correcta
+ - especialidad_incorrecta
  - modificar_turno
+ - modificar_fecha
+ - modificar_horario
+ - modificar_fecha_horario
+ - confirmar_cancelacion
  - cancelar_turno
  - volver_atras
  - volver_al_inicio
@@ -17,6 +28,10 @@ forms:
         - dni
         - obra_social
         - paciente_nuevo
+  
+  especialidad_form:
+    required_slots:
+        - especialidad
 
 slots:
   horario_valido:
@@ -24,12 +39,24 @@ slots:
     initial_value: False
     mappings:
     - type: from_text
-    influence_conversation: True
-  
+    influence_conversation: True 
+  motivo_turno:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_intent
+      intent: solicitar_turno
+      value: "solicitar_turno"
+    - type: from_intent
+      intent: modificar_turno
+      value: "modificar_turno"
+    - type: from_intent
+      intent: cancelar_turno
+      value: "cancelar_turno"
   nombre_apellido:
     type: text
     influence_conversation: true
-    mappings:  # Cómo se llena el slot
+    mappings:  
     - type: from_text 
       conditions:
       - active_loop: pedir_datos_paciente_form
@@ -45,8 +72,8 @@ slots:
   obra_social:
     type: text
     influence_conversation: true
-    mappings:  # Cómo se llena el slot
-    - type: from_text  # Extraer de la entidad "obra_social"
+    mappings: 
+    - type: from_text  
       conditions:
       - active_loop: pedir_datos_paciente_form
         requested_slot: obra_social
@@ -58,6 +85,14 @@ slots:
       conditions:
       - active_loop: pedir_datos_paciente_form
         requested_slot: paciente_nuevo
+  especialidad:
+    type: text
+    influence_conversation: True
+    mappings:
+    - type: from_text
+      conditions: 
+      - active_loop: especialidad_form
+        requested_slot: especialidad
 
 responses:
   utter_menu_opciones:
@@ -81,27 +116,63 @@ responses:
   - text: "¿Me podrías porfavor especificar la obra social? Si el paciente no cuenta con obra social, no la sabés o no la recordás, escribí \"revisar\"."
   utter_ask_paciente_nuevo:
   - text: "¿Es un paciente nuevo en nuestro Centro de Salud? Porfavor, respondé \"sí\", \"no\", \"no lo recuerdo\", o \"desconozco\"."
-  
-  utter_slot_values:
-  - text: "Los datos ingresados del paciente son: {nombre_apellido}, {dni}, {obra_social}. Paciente nuevo: {paciente_nuevo}."
-
-  #utter_tipo_de_turno:
-  #- text: "¿Qué tipo de turno necesitás agendar?"
-  #  buttons:
-  #  - title: "Consulta médica"
-  #    payload: "/consulta_medica"
-  #  - title: "Estudio"
-  #    payload: "/estudio"
-  #  - title: "Volver atrás"
-  #    payload: "/volver_atras"
-  #  - title: "Volver al inicio"
-  #    payload: "/volver_al_inicio"
-  #  - title: "Finalizar conversación"
-  #    payload: "/finalizar_conversacion"
-
+  utter_confirmar_datos:
+  - text: "Los datos ingresados son: {nombre_apellido}, {dni}, {obra_social}. Paciente nuevo: {paciente_nuevo}. ¿Podrías confirmar si son correctos?"
+    buttons:
+    - title: "Sí, son correctos"
+      payload: "/datos_correctos"
+    - title: "No, son incorrectos"
+      payload: "/datos_incorrectos"
+  utter_tipo_de_turno:
+  - text: "¿Qué tipo de turno necesitás agendar?"
+    buttons:
+    - title: "Consulta médica"
+      payload: "/consulta_medica"
+    - title: "Diagnóstico por imágenes"
+      payload: "/diagnostico_imagenes"
+    - title: "Laboratorio"
+      payload: "/laboratorio"
+    - title: "Volver atrás"
+      payload: "/volver_atras"
+    - title: "Volver al inicio"
+      payload: "/volver_al_inicio"
+    - title: "Finalizar conversación"
+      payload: "/finalizar_conversacion"
+  utter_modificar_turno:
+  - text: "¿Qué parte del turno querés modificar?"
+    buttons:
+    - title: "Modificar la fecha"
+      payload: "/modificar_fecha"
+    - title: "Modificar el horario"
+      payload: "/modificar_horario"
+    - title: "Modificar la fecha y el horario"
+      payload: "/modificar_fecha_horario"
+  utter_cancelar_turno:
+  - text: "Seleccionaste cancelar un turno, ¿es correcto?"
+    buttons:
+    - title: "Sí, quiero cancelar"
+      payload: "/confirmar_cancelacion"
+    - title: "No, no quiero cancelar"
+      payload: "/volver_atras"
   utter_despedirse:
   - text: "Gracias por contactarte con nuestro canal virtual de turnos. ¡Qué tengas un excelente día!"
+  utter_ask_especialidad:
+  - text: "¿Podrías porfavor indicar para qué especialidad?"
+  utter_confirmar_especialidad:
+  - text: "La especialidad ingresada es: {especialidad}. ¿Podrías confirmar si es correcta?"
+    buttons:
+    - title: "La especialidad ingresada es correcta"
+      payload: "/especialidad_correcta"
+    - title: "La especialidad ingresada no es correcta"
+      payload: "/especialidad_incorrecta"
+  utter_contacto_agente:
+  - text: "A la brevedad, te contactará un agente de nuestro servicio de salud para terminar con tu solicitud."
+  utter_horarios_laboratorio:
+  - text: "Los análisis de laboratorio no requieren turno previo. La atención es por orden de llegada. Acercáte a nuestra sede de lunes a viernes, entre las 7 y las 12 horas con el pedido médico."
 
 actions:
   - action_check_horario
   - action_restart
+  - action_reset_form
+  - action_reset_form2
+  - action_retomar_motivo_inicial

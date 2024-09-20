@@ -22,8 +22,32 @@ nlu:
     - como estas
     - cómo estas
 
+- intent: datos_correctos
+  examples: |
+    - Sí, son correctos
+    - Si, son correctos
+    - Los datos son correctos
+    - Son correctos
+
+- intent: especialidad_correcta
+  examples: |
+    - La especialidad ingresada es correcta
+    - La especialidad es correcta
+
+- intent: especialidad_incorrecta
+  examples: |
+    - La especialidad ingresada no es correcta
+    - La especialidad no es correcta
+
+- intent: datos_incorrectos
+  examples: |
+    - No, son incorrectos
+    - Son incorrectos
+    - Los datos son incorrectos
+
 - intent: solicitar_turno
   examples: |
+    - Solicitar un turno
     - quiero un turno
     - necesito sacar un turno
     - llamo para un turno
@@ -31,19 +55,63 @@ nlu:
 
 - intent: cancelar_turno
   examples: |
+    - Cancelar un turno
     - quiero cancelar mi turno
     - cancelar turno
 
 - intent: modificar_turno
   examples: |
+    - Modificar un turno
     - quiero modificar mi turno
     - quiero modificar el turno
     - modificar turno
+
+- intent: consulta_medica
+  examples: |
+    - consulta medica
+    - Consulta médica
+
+- intent: diagnostico_imagenes
+  examples: |
+    - diagnositico por imagenes
+    - Diagnóstico por imágenes
+    - diagnostico imagenes
+
+- intent: laboratorio
+  examples: |
+    - laboratorio
+    - Laboratorio
+
+- intent: modificar_fecha
+  examples: |
+    - Modificar la fecha
+    - Modificar fecha
+    - modificar fecha
+
+- intent: modificar_horario
+  examples: |
+    - Modificar el horario
+    - modificar horario
+    - Modificar horario
+
+- intent: modificar_fecha_horario
+  examples: |
+    - Modificar la fecha y el horario
+    - modificar fecha y horario
+    - Modificar la fecha y horario
+    - Modificar fecha y el horario
+
+- intent: confirmar_cancelacion
+  examples: |
+    - Sí, quiero cancelar 
+    - Si, quiero cancelar 
+    - Quiero cancelar 
 
 - intent: volver_atras
   examples: |
     - volver atras
     - volver atrás
+    - No, no quiero cancelar 
 
 - intent: volver_al_inicio
   examples: |

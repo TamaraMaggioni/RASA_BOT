@@ -50,7 +50,93 @@ stories:
   - slot_was_set:
     - paciente_nuevo: si
   - active_loop: null
-  - action: utter_slot_values
+  - action: utter_confirmar_datos
+  - intent: datos_correctos
+  - action: action_retomar_motivo_inicial
+
+- story: datos_incorrectos
+  steps:
+  - intent: datos_incorrectos
+  - action: action_reset_form
+  - action: pedir_datos_paciente_form
+  - active_loop: pedir_datos_paciente_form # inicir el formulario para recolectar datos
+  - slot_was_set:
+    - requested_slot: nombre_apellido
+  - slot_was_set:
+    - nombre_apellido: Virginia Wolff
+  - slot_was_set:
+    - requested_slot: dni
+  - slot_was_set:
+    - dni: 25668975
+  - slot_was_set:
+    - requested_slot: obra_social
+  - slot_was_set:
+    - obra_social: Union Personal 
+  - slot_was_set: 
+    - requested_slot: paciente_nuevo
+  - slot_was_set:
+    - paciente_nuevo: si
+  - active_loop: null
+  - action: utter_confirmar_datos
+  - action: action_listen
+
+- story: continuar_con_solicitar_turno
+  steps:
+  - slot_was_set:
+      - motivo_turno: solicitar_turno  # El motivo inicial era solicitar un turno
+  - action: utter_tipo_de_turno  # Ofrece opciones para solicitar un turno
+  - action: action_listen
+
+- story: especialidad_consulta_medica_diagnositco_imagenes_correcta
+  steps: 
+  - or:
+    - intent: consulta_medica
+    - intent: diagnostico_imagenes
+  - action: especialidad_form
+  - active_loop: especialidad_form
+  - slot_was_set:
+    - requested_slot: especialidad
+  - slot_was_set:
+    - especialidad: electrocardiograma
+  - active_loop: null
+  - action: utter_confirmar_especialidad
+  - intent: especialidad_correcta
+  - action: utter_contacto_agente
+  - action: utter_despedirse
+
+- story: especialidad_consulta_meica_diagnostico_imagenes_incorrecta
+  steps:
+  - intent: especialidad_incorrecta
+  - action: action_reset_form2
+  - action: especialidad_form
+  - active_loop: especialidad_form
+  - slot_was_set:
+    - requested_slot: especialidad
+  - slot_was_set:
+    - especialidad: oftalmologia
+  - active_loop: null
+  - action: utter_confirmar_especialidad
+  - action: action_listen
+
+- story: laboratorio_mensaje
+  steps:
+  - intent: laboratorio
+  - action: utter_horarios_laboratorio
+  - action: utter_despedirse
+
+- story: continuar_con_modificar_turno
+  steps:
+  - slot_was_set:
+      - motivo_turno: modificar_turno  # El motivo inicial era modificar un turno
+  - action: utter_modificar_turno_opciones  # Ofrece opciones para modificar el turno
+  - action: action_listen
+
+- story: continuar_con_cancelar_turno
+  steps:
+  - slot_was_set:
+      - motivo_turno: cancelar_turno  # El motivo inicial era cancelar un turno
+  - action: utter_confirmar_cancelacion  # Pregunta si realmente desea cancelar el turno
+  - action: action_listen
 
 - story: finalizar_conversacion
   steps:

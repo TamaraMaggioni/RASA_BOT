@@ -33,3 +33,51 @@ class ActionCheckHorario(Action):
             print(f"Error en action_check_horario: {e}")
             return []  # No establecer ningún slot en caso de error
 
+
+class ActionResetForm(Action):
+    def name(self):
+        return "action_reset_form"
+
+    def run(self, dispatcher, tracker, domain):
+        return [
+            SlotSet("nombre_apellido", None),
+            SlotSet("dni", None),
+            SlotSet("obra_social", None),
+            SlotSet("paciente_nuevo", None),
+        ]
+        
+class ActionResetForm2(Action):
+    def name(self):
+        return "action_reset_form_2"
+
+    def run(self, dispatcher, tracker, domain):
+        return [
+            SlotSet("especialidad", None)
+        ]  
+
+class ActionRetomarMotivoInicial(Action):
+    def name(self) -> str:
+        return "action_retomar_motivo_inicial"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: dict) -> list:
+        
+        # Obtener el valor del slot 'motivo_turno'
+        motivo_turno = tracker.get_slot('motivo_turno')
+
+        # Responder según el motivo inicial de la llamada
+        if motivo_turno == "solicitar_turno":
+            dispatcher.utter_message(text="Perfecto, continuemos con la solicitud del turno.")
+            dispatcher.utter_message(response="utter_tipo_de_turno")  # Respuesta para solicitar turno
+
+        elif motivo_turno == "modificar_turno":
+            dispatcher.utter_message(text="Perfecto, continuemos con la modificación del turno.")
+            dispatcher.utter_message(response="utter_modificar_turno")  # Respuesta para modificar turno
+
+        elif motivo_turno == "cancelar_turno":
+            dispatcher.utter_message(text="Perfecto, continuemos con la cancelación del turno.")
+            dispatcher.utter_message(response="utter_cancelar_turno")  # Respuesta para cancelar turno
+
+        # Devolver una lista vacía de eventos ya que no se están modificando los slots en esta acción
+        return []

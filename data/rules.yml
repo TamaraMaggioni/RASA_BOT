@@ -10,7 +10,7 @@ rules:
     - horario_valido: True
   - action: utter_menu_opciones 
 
-- rule: Activar_form
+- rule: Activar_form_datos
   steps:
   - or:
     - intent: solicitar_turno
@@ -20,7 +20,7 @@ rules:
   - action: pedir_datos_paciente_form
   - active_loop: pedir_datos_paciente_form
 
-- rule: Desactivar_form
+- rule: Desactivar_form_datos
   condition:
   - active_loop: pedir_datos_paciente_form
   steps: 
@@ -28,7 +28,47 @@ rules:
   - active_loop: null
   - slot_was_set:
     - requested_slot: null
-  - action: utter_slot_values
+  - action: utter_confirmar_datos
+
+- rule: Activar_form_especialidad
+  steps:
+  - or:
+    - intent: consulta_medica
+    - intent: diagnostico_imagenes
+  - action: especialidad_form
+  - active_loop: especialidad_form
+
+- rule: Desactivar_form_especialidad
+  condition:
+  - active_loop: especialidad_form
+  steps:
+  - action: especialidad_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: utter_confirmar_especialidad
+
+- rule: continuar_segun_motivo
+  condition:
+  - active_loop: null  # El formulario ya se completó
+  steps:
+  - action: utter_confirmar_datos  # Pregunta si los datos son correctos
+  - intent: datos_correctos  # El usuario confirma que los datos son correctos
+  - action: action_retomar_motivo_inicial  # Retoma el flujo según el motivo inicial
+
+- rule: volver_a_llenar_formulario_si_datos_incorrectos
+  steps:
+  - intent: datos_incorrectos  # El usuario dice que los datos no son correctos
+  - action: action_reset_form  # Limpia los datos del formulario
+  - action: pedir_datos_paciente_form  # Vuelve a pedir los datos
+  - active_loop: pedir_datos_paciente_form
+
+- rule: volver_a_llenar_formulario_si_especialidad_incorrecta
+  steps:
+  - intent: especialidad_incorrecta
+  - action: action_reset_form2
+  - action: especialidad_form
+  - active_loop: especialidad_form
 
 - rule: volver_atras
   steps:
