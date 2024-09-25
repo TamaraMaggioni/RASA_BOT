@@ -104,7 +104,7 @@ stories:
   - action: utter_contacto_agente
   - action: utter_despedirse
 
-- story: especialidad_consulta_meica_diagnostico_imagenes_incorrecta
+- story: especialidad_consulta_medica_diagnostico_imagenes_incorrecta
   steps:
   - intent: especialidad_incorrecta
   - action: action_reset_form2
@@ -128,14 +128,55 @@ stories:
   steps:
   - slot_was_set:
       - motivo_turno: modificar_turno  # El motivo inicial era modificar un turno
-  - action: utter_modificar_turno_opciones  # Ofrece opciones para modificar el turno
+  - action: utter_modificar_turno  # Ofrece opciones para modificar el turno
+  - action: action_listen
+
+- story: modificar_correcta
+  steps: 
+  - or:
+    - intent: modificar_fecha
+    - intent: modificar_horario
+    - intent: modificar_fecha_horario
+  - slot_was_set:
+      - requested_slot: fecha_hora_modificar
+  - slot_was_set:
+      - fecha_hora_modificar: "fecha y horario"
+  - action: especialidad2_form
+  - active_loop: especialidad2_form
+  - slot_was_set:
+      - requested_slot: especialidad
+  - slot_was_set:
+      - especialidad: nutricion
+  - active_loop: null
+  - action: utter_confirmar_modificacion_especialidad
+  - intent: modificacion_especialidad_correctas
+  - action: utter_contacto_agente
+  - action: utter_despedirse
+
+- story: modificar_incorrecta
+  steps: 
+  - intent: modificacion_especialidad_incorrectas
+  - action: action_reset_form3
+  - action: utter_modificar_turno
+  - slot_was_set:
+      - requested_slot: fecha_hora_modificar
+  - slot_was_set:
+      - fecha_hora_modificar: "fecha y horario"
+  - action: especialidad2_form
+  - active_loop: especialidad2_form
+  - slot_was_set:
+      - requested_slot: especialidad
+  - slot_was_set:
+      - especialidad: nutricion
+  - active_loop: null
+  - action: utter_confirmar_modificacion_especialidad
   - action: action_listen
 
 - story: continuar_con_cancelar_turno
   steps:
   - slot_was_set:
       - motivo_turno: cancelar_turno  # El motivo inicial era cancelar un turno
-  - action: utter_confirmar_cancelacion  # Pregunta si realmente desea cancelar el turno
+  - action: utter_cancelar_turno  # Pregunta si realmente desea cancelar el turno
   - action: action_listen
 
 - story: finalizar_conversacion
@@ -152,5 +193,6 @@ stories:
   steps:
   - intent: volver_atras
   - action: utter_menu_opciones
+
 
 

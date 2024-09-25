@@ -4,6 +4,7 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
 import datetime
 
+
 class ActionCheckHorario(Action):
     def name(self) -> Text:
         return "action_check_horario"
@@ -17,7 +18,7 @@ class ActionCheckHorario(Action):
             now = datetime.datetime.now()
 
             # Verificar si es un día laborable y dentro del horario de atención
-            if now.weekday() < 5 and 8 <= now.hour < 18:
+            if now.weekday() < 5 and 8 <= now.hour < 21:
             # Si es dentro del horario, puedes continuar con el flujo de agendamiento
                 dispatcher.utter_message(text="¡Hola! ¿Cómo estás? Mi nombre es Elena, la asistente virutal del Hospital. Te voy a estar ayudando a gestionar tu turno médico.") 
                 return [SlotSet("horario_valido", True)] # Indicar que el horario es válido
@@ -81,3 +82,15 @@ class ActionRetomarMotivoInicial(Action):
 
         # Devolver una lista vacía de eventos ya que no se están modificando los slots en esta acción
         return []
+
+
+class ActionResetForm3(Action):
+    def name(self) -> str:
+        return "action_reset_form3"
+
+    def run(self, dispatcher, tracker, domain) -> List[Dict[Text, Any]]:
+        # Reinicia los slots relacionados con la modificación del turno y especialidad
+        return [
+            SlotSet("especialidad", None),
+            SlotSet("fecha_hora_modificar", None)
+        ]

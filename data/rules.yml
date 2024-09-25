@@ -30,6 +30,21 @@ rules:
     - requested_slot: null
   - action: utter_confirmar_datos
 
+- rule: volver_a_llenar_formulario_si_datos_incorrectos
+  steps:
+  - intent: datos_incorrectos  # El usuario dice que los datos no son correctos
+  - action: action_reset_form  # Limpia los datos del formulario
+  - action: pedir_datos_paciente_form  # Vuelve a pedir los datos
+  - active_loop: pedir_datos_paciente_form
+
+- rule: continuar_segun_motivo
+  condition:
+  - active_loop: null  # El formulario ya se completó
+  steps:
+  - action: utter_confirmar_datos  # Pregunta si los datos son correctos
+  - intent: datos_correctos  # El usuario confirma que los datos son correctos
+  - action: action_retomar_motivo_inicial  # Retoma el flujo según el motivo inicial
+  
 - rule: Activar_form_especialidad
   steps:
   - or:
@@ -48,27 +63,54 @@ rules:
     - requested_slot: null
   - action: utter_confirmar_especialidad
 
-- rule: continuar_segun_motivo
-  condition:
-  - active_loop: null  # El formulario ya se completó
-  steps:
-  - action: utter_confirmar_datos  # Pregunta si los datos son correctos
-  - intent: datos_correctos  # El usuario confirma que los datos son correctos
-  - action: action_retomar_motivo_inicial  # Retoma el flujo según el motivo inicial
-
-- rule: volver_a_llenar_formulario_si_datos_incorrectos
-  steps:
-  - intent: datos_incorrectos  # El usuario dice que los datos no son correctos
-  - action: action_reset_form  # Limpia los datos del formulario
-  - action: pedir_datos_paciente_form  # Vuelve a pedir los datos
-  - active_loop: pedir_datos_paciente_form
-
 - rule: volver_a_llenar_formulario_si_especialidad_incorrecta
   steps:
   - intent: especialidad_incorrecta
   - action: action_reset_form2
   - action: especialidad_form
   - active_loop: especialidad_form
+
+- rule: Activar_form_especialidad2
+  steps:
+  - or:
+    - intent: modificar_fecha
+    - intent: modificar_horario
+    - intent: modificar_fecha_horario
+  - slot_was_set:
+      - requested_slot: fecha_hora_modificar
+  - slot_was_set:
+      - fecha_hora_modificar: "fecha y horario"
+  - slot_was_set:
+      - especialidad: nutricion  # Asignando un valor aquí
+  - action: especialidad2_form
+  - active_loop: especialidad2_form
+
+- rule: Desactivar_form_especialidad2
+  condition:
+  - active_loop: especialidad2_form
+  steps:
+  - active_loop: null
+  - slot_was_set:
+      - requested_slot: null
+  - action: utter_confirmar_modificacion_especialidad
+
+- rule: volver_a_llenar_formulario_si_especialidad2_incorrecta
+  steps:
+  - intent: modificacion_especialidad_incorrectas
+  - action: action_reset_form3
+  - action: utter_modificar_turno
+  - slot_was_set:
+      - requested_slot: fecha_hora_modificar
+  - slot_was_set:
+      - fecha_hora_modificar: "fecha y horario"
+  - action: especialidad2_form
+  - active_loop: especialidad2_form
+  - slot_was_set:
+      - requested_slot: especialidad
+  - slot_was_set:
+      - especialidad: nutricion
+  - active_loop: null
+  - action: utter_confirmar_modificacion_especialidad
 
 - rule: volver_atras
   steps:

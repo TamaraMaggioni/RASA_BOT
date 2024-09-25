@@ -1,13 +1,8 @@
 version: "3.1"
-
-regex:
-- name: dni
-  pattern: '[0-9]{7,8}'
-
 nlu:
 - intent: saludar
   examples: |
-    - hola 
+    - hola
     - buen dia
     - hola buen dia
     - hola buen día
@@ -21,30 +16,40 @@ nlu:
     - cómo estás
     - como estas
     - cómo estas
-
+    - tamara m
+    - tamara maggioni
+    - swiss medical
 - intent: datos_correctos
   examples: |
     - Sí, son correctos
     - Si, son correctos
     - Los datos son correctos
     - Son correctos
-
 - intent: especialidad_correcta
   examples: |
     - La especialidad ingresada es correcta
     - La especialidad es correcta
-
 - intent: especialidad_incorrecta
   examples: |
     - La especialidad ingresada no es correcta
     - La especialidad no es correcta
-
+- intent: modificacion_especialidad_correctas
+  examples: |
+    - Sí, tanto la modificación como la especialidad son correctas
+    - Si, tanto la modificación como la especialidad son correctas
+    - Sí, tanto la modificación como la especialidad son correctas.
+    - Si, tanto la modificación como la especialidad son correctas.
+- intent: modificacion_especialidad_incorrectas
+  examples: |
+    - No, la modificación y/o la especialidad son incorrectas.
+    - No, la modificación y/o la especialidad son incorrectas
+    - No, la modificación y o la especialidad son incorrectas.
+    - No, la modificación y o la especialidad son incorrectas
 - intent: datos_incorrectos
   examples: |
     - No, son incorrectos
     - Son incorrectos
     - Los datos son incorrectos
-
 - intent: solicitar_turno
   examples: |
     - Solicitar un turno
@@ -52,83 +57,64 @@ nlu:
     - necesito sacar un turno
     - llamo para un turno
     - quiero agendar un turno
-
+    - necesito agendar un turno
+    - nesecito sacar un turno
 - intent: cancelar_turno
   examples: |
     - Cancelar un turno
     - quiero cancelar mi turno
     - cancelar turno
-
 - intent: modificar_turno
   examples: |
     - Modificar un turno
     - quiero modificar mi turno
     - quiero modificar el turno
     - modificar turno
-
 - intent: consulta_medica
   examples: |
     - consulta medica
     - Consulta médica
-
 - intent: diagnostico_imagenes
   examples: |
     - diagnositico por imagenes
     - Diagnóstico por imágenes
     - diagnostico imagenes
-
 - intent: laboratorio
   examples: |
     - laboratorio
     - Laboratorio
-
+    - 30589210
 - intent: modificar_fecha
   examples: |
-    - Modificar la fecha
-    - Modificar fecha
-    - modificar fecha
-
+    - Modificar la [fecha](fecha_hora_modificar)
+    - Modificar [fecha](fecha_hora_modificar)
+    - modificar [fecha](fecha_hora_modificar)
 - intent: modificar_horario
   examples: |
-    - Modificar el horario
-    - modificar horario
-    - Modificar horario
-
+    - Modificar el [horario](fecha_hora_modificar)
+    - modificar [horario](fecha_hora_modificar)
+    - Modificar [horario](fecha_hora_modificar)
 - intent: modificar_fecha_horario
   examples: |
-    - Modificar la fecha y el horario
-    - modificar fecha y horario
-    - Modificar la fecha y horario
-    - Modificar fecha y el horario
-
+    - Modificar la [fecha y el horario](fecha_hora_modificar)
+    - modificar [fecha y horario](fecha_hora_modificar)
+    - Modificar la [fecha y horario](fecha_hora_modificar)
+    - Modificar [fecha y el horario](fecha_hora_modificar)
 - intent: confirmar_cancelacion
   examples: |
-    - Sí, quiero cancelar 
-    - Si, quiero cancelar 
-    - Quiero cancelar 
-
+    - Sí, quiero cancelar
+    - Si, quiero cancelar
+    - Quiero cancelar
 - intent: volver_atras
   examples: |
     - volver atras
     - volver atrás
-    - No, no quiero cancelar 
-
+    - No, no quiero cancelar
 - intent: volver_al_inicio
   examples: |
     - volver al inicio
     - mostrar menu principal
-
-- intent: solicitar_turno
-  examples: |
-    - quiero un turno
-    - necesito agendar un turno
-    - quiero agendar un turno
-    - nesecito sacar un turno
-
 - intent: finalizar_conversacion
   examples: |
     - finalizar conversacion
     - fin conversacion
-
-
-
