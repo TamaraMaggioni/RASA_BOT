@@ -179,6 +179,19 @@ stories:
   - action: utter_cancelar_turno  # Pregunta si realmente desea cancelar el turno
   - action: action_listen
 
+- story: preguntar_motivo_cancelación
+  steps:
+  - intent: confirmar_cancelacion
+  - action: motivo_cancelacion_form
+  - active_loop: motivo_cancelacion_form
+  - slot_was_set:
+    - requested_slot: motivo_cancelacion
+  - slot_was_set:
+    - motivo_cancelacion: tengo otro compromiso 
+  - active_loop: null 
+  - action: utter_contacto_agente
+  - action: utter_despedirse
+
 - story: finalizar_conversacion
   steps:
   - intent: finalizar_conversacion

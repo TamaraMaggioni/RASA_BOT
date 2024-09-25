@@ -35,6 +35,9 @@ forms:
     required_slots:
     - fecha_hora_modificar
     - especialidad
+  motivo_cancelacion_form:
+    required_slots:
+    - motivo_cancelacion
 
 slots:
   horario_valido:
@@ -117,6 +120,14 @@ slots:
     - type: from_intent
       intent: modificar_fecha_horario
       value: "fecha y horario"
+  motivo_cancelacion:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: motivo_cancelacion_form
+        requested_slot: motivo_cancelacion  
 
 responses:
   utter_menu_opciones:
@@ -200,6 +211,8 @@ responses:
   - text: A la brevedad, te contactará un agente de nuestro servicio de salud para terminar con tu solicitud.
   utter_horarios_laboratorio:
   - text: Los análisis de laboratorio no requieren turno previo. La atención es por orden de llegada. Acercáte a nuestra sede de lunes a viernes, entre las 7 y las 12 horas con el pedido médico.
+  utter_ask_motivo_cancelacion:
+  - text: ¿Podrías porfavor indicarnos el motivo de la cancelación? Si no lo sabés o no querés compartirlo, dejá este espacio en blanco.
 
 actions:
 - action_check_horario
