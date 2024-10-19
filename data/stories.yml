@@ -9,14 +9,6 @@ stories:
   - action: action_check_horario
   - checkpoint: horario_verificado
 
-- story: respuesta_dentro_de_horario
-  steps:
-  - checkpoint: horario_verificado
-  - slot_was_set:
-      - horario_valido: True
-  - action: utter_menu_opciones  # Mostrar menú si el horario es válido
-  - action: action_listen
-
 - story: respuesta_fuera_de_horario
   steps:
   - checkpoint: horario_verificado
@@ -24,35 +16,101 @@ stories:
       - horario_valido: False
   - action: action_listen 
 
-- story: pedir_datos_form
+- story: respuesta_dentro_de_horario
   steps:
-  - or:
-    - intent: solicitar_turno #el usuario presiona 1 en el botn de opciones
-    - intent: modificar_turno #el usuario presiona 2 en el botón de opciones
-    - intent: cancelar_turno #el usuario presiona 3 en el botón de opciones
-  - action: utter_pedir_datos
-  - action: pedir_datos_paciente_form
-  - active_loop: pedir_datos_paciente_form # inicir el formulario para recolectar datos
+  - checkpoint: horario_verificado
   - slot_was_set:
-    - requested_slot: nombre_apellido
-  - slot_was_set:
-    - nombre_apellido: Virginia Wolff
+      - horario_valido: True
+  - action: pedir_dni_form  # Pedir dni si el horario es válido
+  - active_loop: pedir_dni_form
   - slot_was_set:
     - requested_slot: dni
   - slot_was_set:
-    - dni: 25668975
+    - dni: 30589210
+  - active_loop: null
+  - action: action_verificar_dni
+
+- story: datos_encontrados_true
+  steps:
+  - action: action_verificar_dni
   - slot_was_set:
-    - requested_slot: obra_social
+      - datos_encontrados: True
+  - action: utter_menu_opciones
+
+- story: datos_encontrados_false
+  steps:
+  - action: action_verificar_dni
   - slot_was_set:
-    - obra_social: Union Personal 
+      - datos_encontrados: False
+  - action: utter_elegir_obra_social
+
+- story: obra_social_listada
+  steps: 
+  - action: utter_elegir_obra_social
+  - or:
+    - intent: PAMI
+    - intent: SWISS_MEDICAL
+    - intent: OSDE
+  - action: pedir_datos_paciente_form
+  - active_loop: pedir_datos_paciente_form 
+  - slot_was_set:
+    - requested_slot: nombre
+  - slot_was_set:
+    - nombre: Juanita
+  - slot_was_set:
+    - requested_slot: apellido
   - slot_was_set: 
-    - requested_slot: paciente_nuevo
+    - apellido: Lopez
   - slot_was_set:
-    - paciente_nuevo: si
+    - requested_slot: dni
+  - slot_was_set:
+    - dni: 25654753
+  - slot_was_set:
+    - requested_slot: null
   - active_loop: null
   - action: utter_confirmar_datos
   - intent: datos_correctos
-  - action: action_retomar_motivo_inicial
+  - action: utter_menu_opciones
+  - action: action_listen
+
+- story: obra_social_no_listada_acepta_pagar
+  steps:
+  - or:
+    - intent: otra
+    - intent: no_tengo
+  - action: utter_informar_pago
+  - intent: abonar_coseguro
+  - action: pedir_datos_paciente_form
+  - slot_was_set:
+    - requested_slot: nombre
+  - slot_was_set:
+    - nombre: Juanita
+  - slot_was_set:
+    - requested_slot: apellido
+  - slot_was_set: 
+    - apellido: Lopez
+  - slot_was_set:
+    - requested_slot: dni
+  - slot_was_set:
+    - dni: 25654753
+  - active_loop: null
+  - action: utter_confirmar_datos
+  - intent: datos_correctos
+  - action: utter_menu_opciones
+  - action: action_listen
+
+- story: obra_social_no_listada_no_acepta_pagar_despedir
+  steps:
+  - intent: no_abonar_coseguro
+  - action: utter_algo_mas
+  - intent: negar
+  - action: utter_despedirse 
+
+- story: obra_social_no_listada_no_acepta_pagar_no_despedir
+  steps:
+  - action: utter_algo_mas
+  - intent: afirmar
+  - action: utter_menu_opciones
 
 - story: datos_incorrectos
   steps:
@@ -61,29 +119,24 @@ stories:
   - action: pedir_datos_paciente_form
   - active_loop: pedir_datos_paciente_form # inicir el formulario para recolectar datos
   - slot_was_set:
-    - requested_slot: nombre_apellido
+    - requested_slot: nombre
   - slot_was_set:
-    - nombre_apellido: Virginia Wolff
+    - nombre: Virginia 
+  - slot_was_set:
+    - requested_slot: apellido
+  - slot_was_set:
+    - apellido: Wolff 
   - slot_was_set:
     - requested_slot: dni
   - slot_was_set:
-    - dni: 25668975
-  - slot_was_set:
-    - requested_slot: obra_social
-  - slot_was_set:
-    - obra_social: Union Personal 
-  - slot_was_set: 
-    - requested_slot: paciente_nuevo
-  - slot_was_set:
-    - paciente_nuevo: si
+    - dni: 23569874 
   - active_loop: null
   - action: utter_confirmar_datos
   - action: action_listen
 
 - story: continuar_con_solicitar_turno
   steps:
-  - slot_was_set:
-      - motivo_turno: solicitar_turno  # El motivo inicial era solicitar un turno
+  - intent: solicitar_turno
   - action: utter_tipo_de_turno  # Ofrece opciones para solicitar un turno
   - action: action_listen
 
@@ -126,8 +179,7 @@ stories:
 
 - story: continuar_con_modificar_turno
   steps:
-  - slot_was_set:
-      - motivo_turno: modificar_turno  # El motivo inicial era modificar un turno
+  - intent: modificar_turno  # El motivo inicial era modificar un turno
   - action: utter_modificar_turno  # Ofrece opciones para modificar el turno
   - action: action_listen
 
@@ -174,8 +226,7 @@ stories:
 
 - story: continuar_con_cancelar_turno
   steps:
-  - slot_was_set:
-      - motivo_turno: cancelar_turno  # El motivo inicial era cancelar un turno
+  - intent: cancelar_turno  # El motivo inicial era cancelar un turno
   - action: utter_cancelar_turno  # Pregunta si realmente desea cancelar el turno
   - action: action_listen
 

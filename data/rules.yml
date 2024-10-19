@@ -2,23 +2,47 @@
 version: "3.1"
 
 rules:
-- rule: mostrar_menu_al_inicio_si_horario_valido
+- rule: Activar_form_dni
   steps:
   - intent: saludar  # O cualquier otro intent que inicie la conversación
   - action: action_check_horario
   - slot_was_set:
-    - horario_valido: True
-  - action: utter_menu_opciones 
+      - horario_valido: True
+  - action: pedir_dni_form  # Inicia el formulario para pedir el DNI
+  - active_loop: pedir_dni_form
 
-- rule: Activar_form_datos
+- rule: Activar acción verificar dni
+  steps:
+    - active_loop: null  # Asegúrate de que no haya un loop activo
+    - slot_was_set:
+        - dni: "30589210"  # Asegúrate de que el DNI se haya establecido
+    - action: action_verificar_dni
+
+- rule: Verificar_DNI
+  steps:
+  - action: action_verificar_dni
+  - slot_was_set:
+      - datos_encontrados: True
+  - action: utter_menu_opciones
+  - action: action_listen
+
+- rule: dni_no_encontrado
+  steps:
+  - action: action_verificar_dni
+  - slot_was_set:
+      - datos_encontrados: False
+  - action: utter_elegir_obra_social  
+
+- rule: activar_pedir_datos_form
   steps:
   - or:
-    - intent: solicitar_turno
-    - intent: modificar_turno
-    - intent: cancelar_turno
-  - action: utter_pedir_datos
+    - intent: PAMI
+    - intent: OSDE
+    - intent: SWISS_MEDICAL
+    - intent: abonar_coseguro
   - action: pedir_datos_paciente_form
   - active_loop: pedir_datos_paciente_form
+
 
 - rule: Desactivar_form_datos
   condition:
@@ -37,14 +61,6 @@ rules:
   - action: pedir_datos_paciente_form  # Vuelve a pedir los datos
   - active_loop: pedir_datos_paciente_form
 
-- rule: continuar_segun_motivo
-  condition:
-  - active_loop: null  # El formulario ya se completó
-  steps:
-  - action: utter_confirmar_datos  # Pregunta si los datos son correctos
-  - intent: datos_correctos  # El usuario confirma que los datos son correctos
-  - action: action_retomar_motivo_inicial  # Retoma el flujo según el motivo inicial
-  
 - rule: Activar_form_especialidad
   steps:
   - or:
@@ -81,7 +97,7 @@ rules:
   - slot_was_set:
       - fecha_hora_modificar: "fecha y horario"
   - slot_was_set:
-      - especialidad: nutricion  # Asignando un valor aquí
+      - especialidad: nutricion  
   - action: especialidad2_form
   - active_loop: especialidad2_form
 

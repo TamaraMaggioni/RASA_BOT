@@ -1,10 +1,12 @@
 version: '3.1'
 intents:
+- afirmar
+- abonar_coseguro
 - cancelar_turno
 - confirmar_cancelacion
 - consulta_medica
-- datos_correctos
 - datos_incorrectos
+- datos_correctos
 - diagnostico_imagenes
 - especialidad_correcta
 - especialidad_incorrecta
@@ -16,18 +18,27 @@ intents:
 - modificar_fecha_horario
 - modificar_horario
 - modificar_turno
+- PAMI
+- SWISS_MEDICAL
+- OSDE
+- otra
+- negar
+- no_abonar_coseguro
+- no_tengo
 - saludar
 - solicitar_turno
 - volver_al_inicio
 - volver_atras
 
 forms:
+  pedir_dni_form:
+    required_slots:
+    - dni
   pedir_datos_paciente_form:
     required_slots:
-    - nombre_apellido
+    - nombre
+    - apellido
     - dni
-    - obra_social
-    - paciente_nuevo
   especialidad_form:
     required_slots:
     - especialidad
@@ -46,51 +57,72 @@ slots:
     mappings:
     - type: from_text
     influence_conversation: true
-  motivo_turno:
-    type: text
-    influence_conversation: true
-    mappings:
-    - type: from_intent
-      intent: solicitar_turno
-      value: solicitar_turno
-    - type: from_intent
-      intent: modificar_turno
-      value: modificar_turno
-    - type: from_intent
-      intent: cancelar_turno
-      value: cancelar_turno
-  nombre_apellido:
-    type: text
-    influence_conversation: true
+  datos_encontrados:
+    type: bool
+    initial_value: False
     mappings:
     - type: from_text
-      conditions:
-      - active_loop: pedir_datos_paciente_form
-        requested_slot: nombre_apellido
+    influence_conversation: true
   dni:
     type: text
     influence_conversation: true
     mappings:
     - type: from_text
       conditions:
+      - active_loop: pedir_dni_form
+        requested_slot: dni
+    - type: from_text
+      conditions:
       - active_loop: pedir_datos_paciente_form
         requested_slot: dni
+  #motivo_turno:
+  #  type: text
+  #  influence_conversation: true
+  #  mappings:
+  #  - type: from_intent
+  #    intent: solicitar_turno
+  #    value: solicitar_turno
+  #  - type: from_intent
+  #    intent: modificar_turno
+  #    value: modificar_turno
+  #  - type: from_intent
+  #    intent: cancelar_turno
+  #    value: cancelar_turno
+  nombre:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: pedir_datos_paciente_form
+        requested_slot: nombre
+  apellido:
+    type: text
+    influence_conversation: True
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: pedir_datos_paciente_form
+        requested_slot: apellido
   obra_social:
     type: text
-    influence_conversation: true
+    influence_conversation: True
     mappings:
-    - type: from_text
-      conditions:
-      - active_loop: pedir_datos_paciente_form
-        requested_slot: obra_social
-  paciente_nuevo:
-    type: text
-    influence_conversation: true
-    mappings:
-    - type: from_text
-      conditions:
-      - active_loop: pedir_datos_paciente_form
-        requested_slot: paciente_nuevo
+    - type: from_intent
+      intent: PAMI
+      value: "PAMI"
+    - type: from_intent
+      intent: SWISS_MEDICAL
+      value: "SWISS MEDICAL"
+    - type: from_intent
+      intent: OSDE
+      value: "OSDE"
+    - type: from_intent
+      intent: otra
+      value: "otra"
+    - type: from_intent
+      intent: no_tengo
+      value: "no tengo"
   especialidad:
     type: text
     influence_conversation: true
@@ -110,7 +142,7 @@ slots:
     - type: from_text
       conditions:
       - active_loop: especialidad2_form
-        requested_slot: fecha_hora_modificar  # Aquí debería ser el slot correcto
+        requested_slot: fecha_hora_modificar  
     - type: from_intent
       intent: modificar_fecha
       value: "fecha"
@@ -130,29 +162,45 @@ slots:
         requested_slot: motivo_cancelacion  
 
 responses:
-  utter_menu_opciones:
-  - text: ¿Qué necesitás hacer?
+  utter_elegir_obra_social:
+  - text: Si tenés obra social, porfavor elegí una de las siguientes. De lo contrario, elegí "no tengo".
     buttons:
-    - title: Solicitar un turno
+    - title: PAMI
+      payload: /PAMI
+    - title: SWISS MEDICAL
+      payload: /SWISS_MEDICAL
+    - title: OSDE
+      payload: /OSDE
+    - title: Otra
+      payload: /otra
+    - title: No tengo
+      payload: /no_tengo     
+  utter_informar_pago:
+  - text: Nuestro centro de salud solo trabaja con las obras sociales listadas, por lo que deberás abonar un coseguro de forma particular. ¿Estás de acuerdo?  
+    buttons:
+    - title: Sí, quiero abonar el coseguro
+      payload: /abonar_coseguro
+    - title: No, no quiero abonar el coseguro
+      payload: /no_abonar_coseguro
+  utter_menu_opciones:
+  - text: ¿En qué te puedo ayudar?
+    buttons:
+    - title: Quiero solicitar un turno
       payload: /solicitar_turno
-    - title: Modificar un turno
+    - title: Quiero modificar un turno
       payload: /modificar_turno
-    - title: Cancelar un turno
+    - title: Quiero cancelar un turno
       payload: /cancelar_turno
     - title: Finalizar conversación
       payload: /finalizar_conversacion
-  utter_pedir_datos:
-  - text: Excelente, antes de ayudarte a proceder con tu solicitud, te voy a pedir algunos datos del paciente.
-  utter_ask_nombre_apellido:
-  - text: ¿Me podrías indicar el nombre completo y apellido del paciente?
   utter_ask_dni:
-  - text: ¿Me podrías facilitar el DNI? Porfavor, escribí los números del DNI sin puntos ni espacios entremedio.
-  utter_ask_obra_social:
-  - text: ¿Me podrías porfavor especificar la obra social? Si el paciente no cuenta con obra social, no la sabés o no la recordás, escribí "revisar".
-  utter_ask_paciente_nuevo:
-  - text: ¿Es un paciente nuevo en nuestro Centro de Salud? Porfavor, respondé "sí", "no", "no lo recuerdo", o "desconozco".
+  - text: ¿Me podrías facilitar el DNI del paciente? Porfavor, escribí los números del DNI sin puntos ni espacios entremedio.
+  utter_ask_nombre:
+  - text: ¿Me podrías indicar el nombre completo del paciente?
+  utter_ask_apellido:
+  - text: ¿Me podrías indicar el apellido completo del paciente?
   utter_confirmar_datos:
-  - text: 'Los datos ingresados son: {nombre_apellido}, {dni}, {obra_social}. Paciente nuevo: {paciente_nuevo}. ¿Podrías confirmar si son correctos?'
+  - text: 'Los datos ingresados son: {nombre} {apellido}, {dni}, {obra_social}. ¿Podrías confirmar si son correctos?'
     buttons:
     - title: Sí, son correctos
       payload: /datos_correctos
@@ -196,6 +244,13 @@ responses:
       payload: /confirmar_cancelacion
     - title: No, no quiero cancelar
       payload: /volver_atras
+  utter_algo_mas:
+  - text: ¿Hay algo más en lo que te pueda ayudar?
+    buttons:
+    - title: No, gracias
+      payload: /negar
+    - title: Sí, porfavor
+      payload: /afirmar
   utter_despedirse:
   - text: Gracias por contactarte con nuestro canal virtual de turnos. ¡Qué tengas un excelente día!
   utter_ask_especialidad:
@@ -216,10 +271,9 @@ responses:
 
 actions:
 - action_check_horario
-- action_restart
+- action_verificar_dni
 - action_reset_form
 - action_reset_form2
-- action_retomar_motivo_inicial
 - action_reset_form3
 
 session_config:
