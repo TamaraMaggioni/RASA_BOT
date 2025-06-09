@@ -29,70 +29,73 @@ stories:
     - dni: 30589210
   - active_loop: null
   - action: action_verificar_dni
+  - checkpoint: verificar_dni_resultado
 
 - story: datos_encontrados_true
   steps:
-  - action: action_verificar_dni
+  - checkpoint: verificar_dni_resultado
   - slot_was_set:
       - datos_encontrados: True
   - action: utter_menu_opciones
 
 - story: datos_encontrados_false
   steps:
-  - action: action_verificar_dni
+  - checkpoint: verificar_dni_resultado
   - slot_was_set:
       - datos_encontrados: False
   - action: utter_elegir_obra_social
 
-- story: obra_social_listada
+- story: obra_social_valida
   steps: 
-  - action: utter_elegir_obra_social
-  - or:
-    - intent: PAMI
-    - intent: SWISS_MEDICAL
-    - intent: OSDE
+  - intent: informar_obra_social
+    entities:
+      - obra_social: "OSDE"
+  - action: action_evaluar_obra_social
+  - slot_was_set:
+      - obra_social_valida: true
   - action: pedir_datos_paciente_form
   - active_loop: pedir_datos_paciente_form 
   - slot_was_set:
-    - requested_slot: nombre
+      - requested_slot: nombre
   - slot_was_set:
-    - nombre: Juanita
+      - nombre: Juanita
   - slot_was_set:
-    - requested_slot: apellido
+      - requested_slot: apellido
   - slot_was_set: 
-    - apellido: Lopez
+      - apellido: Lopez
   - slot_was_set:
-    - requested_slot: dni
+      - requested_slot: dni
   - slot_was_set:
-    - dni: 25654753
-  - slot_was_set:
-    - requested_slot: null
+      - dni: 25654753
   - active_loop: null
   - action: utter_confirmar_datos
   - intent: datos_correctos
   - action: utter_menu_opciones
   - action: action_listen
 
-- story: obra_social_no_listada_acepta_pagar
+- story: obra_social_no_valida_acepta_pagar
   steps:
-  - or:
-    - intent: otra
-    - intent: no_tengo
+  - intent: informar_obra_social
+    entities:
+      - obra_social: "no tengo"
+  - action: action_evaluar_obra_social
+  - slot_was_set:
+      - obra_social_valida: false
   - action: utter_informar_pago
   - intent: abonar_coseguro
   - action: pedir_datos_paciente_form
   - slot_was_set:
-    - requested_slot: nombre
+      - requested_slot: nombre
   - slot_was_set:
-    - nombre: Juanita
+      - nombre: Juanita
   - slot_was_set:
-    - requested_slot: apellido
+      - requested_slot: apellido
   - slot_was_set: 
-    - apellido: Lopez
+      - apellido: Lopez
   - slot_was_set:
-    - requested_slot: dni
+      - requested_slot: dni
   - slot_was_set:
-    - dni: 25654753
+      - dni: 25654753
   - active_loop: null
   - action: utter_confirmar_datos
   - intent: datos_correctos

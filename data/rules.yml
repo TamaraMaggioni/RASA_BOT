@@ -11,38 +11,26 @@ rules:
   - action: pedir_dni_form  # Inicia el formulario para pedir el DNI
   - active_loop: pedir_dni_form
 
-- rule: Activar acción verificar dni
+- rule: obra social valida
   steps:
-    - active_loop: null  # Asegúrate de que no haya un loop activo
-    - slot_was_set:
-        - dni: "30589210"  # Asegúrate de que el DNI se haya establecido
-    - action: action_verificar_dni
-
-- rule: Verificar_DNI
-  steps:
-  - action: action_verificar_dni
+  - action: action_evaluar_obra_social
   - slot_was_set:
-      - datos_encontrados: True
-  - action: utter_menu_opciones
-  - action: action_listen
-
-- rule: dni_no_encontrado
-  steps:
-  - action: action_verificar_dni
-  - slot_was_set:
-      - datos_encontrados: False
-  - action: utter_elegir_obra_social  
-
-- rule: activar_pedir_datos_form
-  steps:
-  - or:
-    - intent: PAMI
-    - intent: OSDE
-    - intent: SWISS_MEDICAL
-    - intent: abonar_coseguro
+      - obra_social_valida: true
   - action: pedir_datos_paciente_form
   - active_loop: pedir_datos_paciente_form
 
+- rule: obra social no válida
+  steps:
+  - action: action_evaluar_obra_social
+  - slot_was_set:
+      - obra_social_valida: false
+  - action: utter_informar_pago
+
+- rule: activar_pedir_datos_form con abonar_coseguro
+  steps:
+  - intent: abonar_coseguro
+  - action: pedir_datos_paciente_form
+  - active_loop: pedir_datos_paciente_form
 
 - rule: Desactivar_form_datos
   condition:

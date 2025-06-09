@@ -11,6 +11,7 @@ intents:
 - especialidad_correcta
 - especialidad_incorrecta
 - finalizar_conversacion
+- informar_obra_social
 - laboratorio
 - modificacion_especialidad_correctas
 - modificacion_especialidad_incorrectas
@@ -18,13 +19,8 @@ intents:
 - modificar_fecha_horario
 - modificar_horario
 - modificar_turno
-- PAMI
-- SWISS_MEDICAL
-- OSDE
-- otra
 - negar
 - no_abonar_coseguro
-- no_tengo
 - saludar
 - solicitar_turno
 - volver_al_inicio
@@ -55,14 +51,14 @@ slots:
     type: bool
     initial_value: false
     mappings:
-    - type: from_text
+    - type: custom
     influence_conversation: true
   datos_encontrados:
     type: bool
     initial_value: False
+    influence_conversation: True
     mappings:
-    - type: from_text
-    influence_conversation: true
+    - type: custom
   dni:
     type: text
     influence_conversation: true
@@ -75,19 +71,6 @@ slots:
       conditions:
       - active_loop: pedir_datos_paciente_form
         requested_slot: dni
-  #motivo_turno:
-  #  type: text
-  #  influence_conversation: true
-  #  mappings:
-  #  - type: from_intent
-  #    intent: solicitar_turno
-  #    value: solicitar_turno
-  #  - type: from_intent
-  #    intent: modificar_turno
-  #    value: modificar_turno
-  #  - type: from_intent
-  #    intent: cancelar_turno
-  #    value: cancelar_turno
   nombre:
     type: text
     influence_conversation: true
@@ -108,21 +91,13 @@ slots:
     type: text
     influence_conversation: True
     mappings:
-    - type: from_intent
-      intent: PAMI
-      value: "PAMI"
-    - type: from_intent
-      intent: SWISS_MEDICAL
-      value: "SWISS MEDICAL"
-    - type: from_intent
-      intent: OSDE
-      value: "OSDE"
-    - type: from_intent
-      intent: otra
-      value: "otra"
-    - type: from_intent
-      intent: no_tengo
-      value: "no tengo"
+    - type: from_entity
+      entity: obra_social
+  obra_social_valida:
+    type: bool
+    influence_conversation: True
+    mappings:
+    - type: custom
   especialidad:
     type: text
     influence_conversation: true
@@ -161,20 +136,23 @@ slots:
       - active_loop: motivo_cancelacion_form
         requested_slot: motivo_cancelacion  
 
+entities:
+  - obra_social
+
 responses:
   utter_elegir_obra_social:
   - text: Si tenés obra social, porfavor elegí una de las siguientes. De lo contrario, elegí "no tengo".
     buttons:
     - title: PAMI
-      payload: /PAMI
+      payload: '/informar_obra_social{"obra_social": "PAMI"}'
     - title: SWISS MEDICAL
-      payload: /SWISS_MEDICAL
+      payload: '/informar_obra_social{"obra_social": "SWISS MEDICAL"}'
     - title: OSDE
-      payload: /OSDE
+      payload: '/informar_obra_social{"obra_social": "OSDE"}'
     - title: Otra
-      payload: /otra
+      payload: '/informar_obra_social{"obra_social": "otra"}'
     - title: No tengo
-      payload: /no_tengo     
+      payload: '/informar_obra_social{"obra_social": "no tengo"}'
   utter_informar_pago:
   - text: Nuestro centro de salud solo trabaja con las obras sociales listadas, por lo que deberás abonar un coseguro de forma particular. ¿Estás de acuerdo?  
     buttons:
@@ -196,7 +174,7 @@ responses:
   utter_ask_dni:
   - text: ¿Me podrías facilitar el DNI del paciente? Porfavor, escribí los números del DNI sin puntos ni espacios entremedio.
   utter_ask_nombre:
-  - text: ¿Me podrías indicar el nombre completo del paciente?
+  - text: ¿Me podrías indicar el primer nombre completo del paciente?
   utter_ask_apellido:
   - text: ¿Me podrías indicar el apellido completo del paciente?
   utter_confirmar_datos:
@@ -271,6 +249,7 @@ responses:
 
 actions:
 - action_check_horario
+- action_evaluar_obra_social
 - action_verificar_dni
 - action_reset_form
 - action_reset_form2

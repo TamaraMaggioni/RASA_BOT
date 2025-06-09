@@ -30,30 +30,14 @@ nlu:
     - tamara maggioni
     - swiss medical
 
-- intent: PAMI
-  examples: |
-    - PAMI
-    - Pami
-
-- intent: SWISS_MEDICAL
-  examples: |
-    - SWISS MEDICAL
-    - Swiss Medical
-
-- intent: OSDE
+- intent: informar_obra_social
   examples: |
     - OSDE
-    - Osde
-
-- intent: otra
-  examples: |
-    - Otra
+    - SWISS MEDICAL
+    - Swiss Medical
+    - PAMI
     - otra
-
-- intent: no_tengo
-  examples: |
     - no tengo
-    - No tengo
 
 - intent: abonar_coseguro
   examples: |

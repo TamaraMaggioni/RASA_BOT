@@ -37,38 +37,6 @@ class ActionCheckHorario(Action):
             return []  # No establecer ningún slot en caso de error
 
 
-
-
-#class ActionVerificarDNI(Action):
-#    def name(self) -> Text:
-#        return "action_verificar_dni"
-
-#    def run(self, dispatcher: CollectingDispatcher,
-#            tracker: Tracker,
-#            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-#        dni = tracker.get_slot('dni')
-#        if not dni:
-#            dispatcher.utter_message(text="No estás registrado en nuestro sistema.")
-#            return []
-
-#        url = f"http://127.0.0.1/clients/{dni}"
-#        response = requests.get(url)
-
-#        if response.status_code == 200:
-#            data = response.json()
-#            nombre = data.get("nombre", None)
-#            apellido = data.get("apellido", None)
-#            if nombre and apellido:
-#                # Guardar los datos en los slots
-#                return [SlotSet("nombre", nombre), SlotSet("apellido", apellido), SlotSet("datos_encontrados", True)]
-#            else:
-#                dispatcher.utter_message(text="Lo lamento, no encontramos tus datos en nuestro sistema.")
-#                return [SlotSet("datos_encontrados", False)]
-#        else:
-#            dispatcher.utter_message(text="Hubo un error al verificar el DNI. Por favor, intenta nuevamente más tarde.")
-#            return []
-
 class ActionVerificarDNI(Action):
     def name(self) -> Text:
         return "action_verificar_dni"
@@ -91,7 +59,7 @@ class ActionVerificarDNI(Action):
                 apellido = patient_data['Apellido'].values[0]
                 obra_social = patient_data['Obra Social'].values[0]
                 dispatcher.utter_message(text=f"¡Hola {nombre} {apellido}!")
-                dispatcher.utter_message(template="utter_elegir_obra_social")
+                dispatcher.utter_message(response="utter_menu_opciones")
                 
                 # Guardar los datos en los slots
                 return [
@@ -101,15 +69,35 @@ class ActionVerificarDNI(Action):
                     SlotSet("datos_encontrados", True)
                 ]
             else:
-                dispatcher.utter_message(text="No encontramos tu DNI en nuestro sistema. Vamos a necesitar algunos datos del paciente.")
-                dispatcher.utter_message(template="utter_elegir_obra_social")
-                return [SlotSet("datos_encontrados", False)]
-        
+                dispatcher.utter_message(text="No encontramos tu DNI en nuestro sistema. Vamos a necesitar algunos datos del paciente.")              
+                
+                return [
+                    SlotSet("nombre", None),
+                    SlotSet("apellido", None),
+                    SlotSet("obra_social", None),
+                    SlotSet("datos_encontrados", False)]
+            
         except Exception as e:
             dispatcher.utter_message(text="Hubo un error al procesar tu solicitud. Por favor, inténtalo más tarde.")
             print(f"Error al ejecutar la acción: {e}")
             return []
 
+
+class ActionEvaluarObraSocial(Action):
+    def name(self) -> Text:
+        return "action_evaluar_obra_social"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        obra_social = tracker.get_slot("obra_social")
+        obras_validas = ["PAMI", "SWISS MEDICAL", "OSDE"]
+
+        if obra_social and obra_social.upper() in [o.upper() for o in obras_validas]:
+            return [SlotSet("obra_social_valida", True)]
+        else:
+            return [SlotSet("obra_social_valida", False)]
 
 class ActionResetForm(Action):
     def name(self):
