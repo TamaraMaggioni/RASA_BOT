@@ -44,42 +44,40 @@ class ActionVerificarDNI(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        
-        dni = tracker.get_slot('dni')
-        
+
+        dni = tracker.get_slot("dni")
+
         try:
-            # Cargar el archivo Excel
-            df = pd.read_excel('/home/dipsi/DataScience/FreeTECH/RASA/RASA_BOT/pacientes.xlsx')
+            df = pd.read_excel("/home/dipsi/DataScience/FreeTECH/RASA/RASA_BOT/pacientes.xlsx")
+            patient_data = df[df["DNI"].astype(str) == str(dni)]
 
-            # Filtrar los datos del paciente por DNI
-            patient_data = df[df['DNI'].astype(str) == str(dni)]
+            if patient_data.empty:
+                dispatcher.utter_message(text="No encontramos tu DNI en nuestro sistema. Vamos a necesitar algunos datos del paciente.")
+                return [
+                    SlotSet("nombre", None),
+                    SlotSet("apellido", None),
+                    SlotSet("obra_social", None),
+                    SlotSet("datos_encontrados", False)
+                ]
+            
+            else:
+               #Si se encuentra el paciente:
+                nombre = patient_data["Nombre"].values[0]
+                apellido = patient_data["Apellido"].values[0]
+                obra_social = patient_data["Obra Social"].values[0]
 
-            if not patient_data.empty:
-                nombre = patient_data['Nombre'].values[0]
-                apellido = patient_data['Apellido'].values[0]
-                obra_social = patient_data['Obra Social'].values[0]
                 dispatcher.utter_message(text=f"¡Hola {nombre} {apellido}!")
-                dispatcher.utter_message(response="utter_menu_opciones")
-                
-                # Guardar los datos en los slots
+
                 return [
                     SlotSet("nombre", nombre),
                     SlotSet("apellido", apellido),
                     SlotSet("obra_social", obra_social),
                     SlotSet("datos_encontrados", True)
                 ]
-            else:
-                dispatcher.utter_message(text="No encontramos tu DNI en nuestro sistema. Vamos a necesitar algunos datos del paciente.")              
-                
-                return [
-                    SlotSet("nombre", None),
-                    SlotSet("apellido", None),
-                    SlotSet("obra_social", None),
-                    SlotSet("datos_encontrados", False)]
-            
+
         except Exception as e:
-            dispatcher.utter_message(text="Hubo un error al procesar tu solicitud. Por favor, inténtalo más tarde.")
-            print(f"Error al ejecutar la acción: {e}")
+            dispatcher.utter_message(text="Hubo un error al procesar tu solicitud. Por favor, intentá más tarde.")
+            print(f"Error en action_verificar_dni: {e}")
             return []
 
 
