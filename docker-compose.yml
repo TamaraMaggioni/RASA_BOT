@@ -1,0 +1,154 @@
+
+services:
+
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+  #   command: redis-server /usr/local/etc/redis/redis.conf
+  #   networks:
+  #     - rasa-network
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #   profiles:
+  #     - dev
+
+  # Servicio de entrenamiento
+  rasa-train:
+    build: .
+    command: ["rasa", "train", "--force"]
+    volumes:
+      # Datos de entrenamiento (solo lectura)
+      - ./data:/app/data:ro
+      - ./domain.yml:/app/domain.yml:ro
+      - ./config.yml:/app/config.yml:ro
+      - ./actions:/app/actions:ro
+      # Modelos generados (escritura)
+      - ./models:/app/models
+      # Logs y cache
+      - train-cache:/app/.rasa
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SQLALCHEMY_SILENCE_UBER_WARNING=1
+    networks:
+      - rasa-network
+    restart: "no"
+    profiles:
+      - train
+
+  # Action Server
+  rasa-actions:
+    build: .
+    command: ["rasa", "run", "actions", "-p", "5055"]
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./actions:/app/actions:ro
+      - ./domain.yml:/app/domain.yml:ro
+      - ./pacientes.xlsx:/app/pacientes.xlsx:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SQLALCHEMY_SILENCE_UBER_WARNING=1
+    networks:
+      - rasa-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5055/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    profiles:
+      - production
+      - dev
+
+  # Rasa HTTP Server
+  rasa-server:
+    build: .
+    command: ["rasa", "run", "-p", "5005", "--enable-api", "--cors", "*"]
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./models:/app/models:ro
+      - ./endpoints.yml:/app/endpoints.yml:ro
+      - ./pacientes.xlsx:/app/pacientes.xlsx:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SQLALCHEMY_SILENCE_UBER_WARNING=1
+    depends_on:
+      rasa-actions:
+        condition: service_healthy
+    networks:
+      - rasa-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5005/version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    profiles:
+      - production
+
+  # Rasa HTTP Dev
+  rasa-shell:
+    build: .
+    depends_on:
+      - rasa-actions
+    command: sleep 36000
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./models:/app/models:ro
+      - ./endpoints.yml:/app/endpoints.yml:ro
+      - ./pacientes.xlsx:/app/pacientes.xlsx:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SQLALCHEMY_SILENCE_UBER_WARNING=1
+    networks:
+      - rasa-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5005/version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    profiles:
+      - dev
+
+  whatsapp:
+    build:
+      context: ../whatsmeow_rasa/
+      dockerfile: Dockerfile
+    image: fabianpignataro/whatsapp_web:latest  
+    volumes:
+      - ./whatsapp/whatsmeow.db:/root/whatsmeow.db:rw
+#      - ./.env:/root/.env:ro
+    environment:
+      - RASA_URL=${RASA_URL}
+      - SQL_DB_FILE_NAME=${DB_FILE_NAME}
+      - PAIR_PHONE_NUMBER=${PHONE_NUMBER}
+    ports:
+      - "8080:8080"
+    networks:
+      - rasa-network
+    profiles:
+      - production
+      
+volumes:
+  train-cache:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  rasa-network:
+    driver: bridge
