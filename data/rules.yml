@@ -11,11 +11,30 @@ rules:
   - action: pedir_dni_form  # Inicia el formulario para pedir el DNI
   - active_loop: pedir_dni_form
 
+- rule: Ejecutar formulario de obra social si no se encuentra el DNI
+  condition:
+  - slot_was_set:
+      - datos_encontrados: False
+  steps:
+  - action: obra_social_form
+  - active_loop: obra_social_form
+
+- rule: Desactivar form obra social
+  condition:
+  - active_loop: obra_social_form
+  steps:
+  - action: obra_social_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_evaluar_obra_social
+  wait_for_user_input: False
+
 - rule: obra social valida
   steps:
   - action: action_evaluar_obra_social
   - slot_was_set:
-      - obra_social_valida: true
+      - obra_social_valida: True
   - action: pedir_datos_paciente_form
   - active_loop: pedir_datos_paciente_form
 
@@ -23,7 +42,7 @@ rules:
   steps:
   - action: action_evaluar_obra_social
   - slot_was_set:
-      - obra_social_valida: false
+      - obra_social_valida: False
   - action: utter_informar_pago
 
 - rule: activar_pedir_datos_form con abonar_coseguro

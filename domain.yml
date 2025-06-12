@@ -35,6 +35,9 @@ forms:
     - nombre
     - apellido
     - dni
+  obra_social_form:
+    required_slots:
+    - obra_social
   especialidad_form:
     required_slots:
     - especialidad
@@ -91,8 +94,10 @@ slots:
     type: text
     influence_conversation: True
     mappings:
-    - type: from_entity
-      entity: obra_social
+    - type: from_text
+      conditions:
+      - active_loop: obra_social_form
+        requested_slot: obra_social
   obra_social_valida:
     type: bool
     influence_conversation: True
@@ -136,23 +141,20 @@ slots:
       - active_loop: motivo_cancelacion_form
         requested_slot: motivo_cancelacion  
 
-entities:
-  - obra_social
-
 responses:
-  utter_elegir_obra_social:
+  utter_ask_obra_social:
   - text: Si tenés obra social, porfavor elegí una de las siguientes. De lo contrario, elegí "no tengo".
     buttons:
     - title: PAMI
-      payload: '/informar_obra_social{"obra_social": "PAMI"}'
+      payload: "PAMI"
     - title: SWISS MEDICAL
-      payload: '/informar_obra_social{"obra_social": "SWISS MEDICAL"}'
+      payload: "SWISS MEDICAL"
     - title: OSDE
-      payload: '/informar_obra_social{"obra_social": "OSDE"}'
+      payload: "OSDE"
     - title: Otra
-      payload: '/informar_obra_social{"obra_social": "otra"}'
+      payload: "otra"
     - title: No tengo
-      payload: '/informar_obra_social{"obra_social": "no tengo"}'
+      payload: "no tengo"
   utter_informar_pago:
   - text: Nuestro centro de salud solo trabaja con las obras sociales listadas, por lo que deberás abonar un coseguro de forma particular. ¿Estás de acuerdo?  
     buttons:
